@@ -26,5 +26,15 @@ namespace Products.DAL.Data
             builder.Entity<Vendor>()
                 .HasKey(k => k.Code);
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //var configuration = new ConfigurationBuilder()
+            //      .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            //      .AddJsonFile("appsettings.json")
+            //      .Build();
+
+            optionsBuilder.UseSqlServer("Server=localhost;Database=ProductsDatabase;Trusted_Connection=True;user=DESKTOP-EB31SD2\\btsan");
+        }
     }
 }

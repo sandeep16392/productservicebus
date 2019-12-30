@@ -36,15 +36,15 @@ namespace ProductsQ.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().AddNewtonsoftJson();
-            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("ProductsDatabase")), ServiceLifetime.Singleton);
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("ProductsDatabase")));
 
             services.AddAutoMapper(typeof(AutomapperProfile));
 
             services.AddScoped<ServiceBusSender>();
-            services.AddSingleton<IProductsRepository, ProductRepository>();
-            services.AddSingleton<IVendorRepository, VendorRepository>();
-            services.AddSingleton<IProcessData, ProcessData>();
-            services.AddSingleton<IServiceBusConsumer, ServiceBusConsumer>();
+            services.AddTransient<IProductsRepository, ProductRepository>();
+            services.AddTransient<IVendorRepository, VendorRepository>();
+            services.AddTransient<IProcessData, ProcessData>();
+            services.AddTransient<IServiceBusConsumer, ServiceBusConsumer>();
 
             services.AddSwaggerGen(c =>
             {
