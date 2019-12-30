@@ -1,9 +1,7 @@
 language: csharp
+mono: none
+dotnet: 2.1.502
 solution: Products.sln
-
-jobs:
-  include:
-    - dotnet: 3.1
-      mono: none
-      env: DOTNETCORE=3.1  # optional, can be used to take different code paths in your script
-    - mono: latest
+script:
+  - dotnet restore
+  - dotnet test
