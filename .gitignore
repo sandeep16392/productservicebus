@@ -1,0 +1,7 @@
+/Products.DAL/obj/
+/Products.DAL/bin/
+/Products.ServiceBusMessaging/bin/
+/Products.ServiceBusMessaging/obj/
+/ProductsQ.Api/bin/
+/ProductsQ.Api/obj/
+/.vs/
