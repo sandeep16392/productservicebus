@@ -35,7 +35,9 @@ namespace ProductsQ.Api
         public IContainer ApplicationContainer { get; private set; }
         public void ConfigureServices(IServiceCollection services)
         {
+            var isLocal = Convert.ToBoolean(Configuration.GetSection("ImplementWithLocalObject").Value);
             services.AddMvc().AddNewtonsoftJson();
+
             services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("ProductsDatabase")));
 
             services.AddAutoMapper(typeof(AutomapperProfile));
@@ -107,6 +109,9 @@ namespace ProductsQ.Api
         }
         private void UpdateDatabase(IApplicationBuilder app)
         {
+            var isLocal = Convert.ToBoolean(Configuration.GetSection("ImplementWithLocalObject").Value);
+            if (isLocal)
+                return;
             using (var serviceScope = app.ApplicationServices
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
