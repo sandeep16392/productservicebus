@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Products.DAL.Abstraction;
 using Products.DAL.DomainModels;
 
@@ -15,11 +16,16 @@ namespace ProductsQ.Api.Controllers
     public class VendorsController : ControllerBase
     {
         private readonly IVendorRepository _vendorRepository;
-
         public VendorsController(IVendorRepository vendorRepository)
         {
             this._vendorRepository = vendorRepository;
+            
         }
+        /// <summary>
+        /// Adds Vendors to repository.
+        /// </summary>
+        /// <param name="vendor"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody][Required] VendorDm vendor)
         {
@@ -58,6 +64,10 @@ namespace ProductsQ.Api.Controllers
                 return Conflict("Vendor Not Present.");
             }
         }
+        /// <summary>
+        /// Retrieve all vendors present in repository
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/vendors")]
         public async Task<IActionResult> RetrieveAll()
         {

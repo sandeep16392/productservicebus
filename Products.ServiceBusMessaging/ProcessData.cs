@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Products.DAL.EntityModels;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace Products.ServiceBusMessaging
 {
@@ -19,15 +20,41 @@ namespace Products.ServiceBusMessaging
         private readonly IProductsRepository _productRepository;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IMapper _mapper;
-
-        public ProcessData(IProductsRepository productRepository, IServiceScopeFactory serviceScopeFactory, IMapper mapper)
+        private readonly IConfiguration configuration;
+        private bool IsLocalObjectImplementation = false;
+        public List<Product> Products { get; set; }
+        public ProcessData(IProductsRepository productRepository, IServiceScopeFactory serviceScopeFactory, IMapper mapper, IConfiguration configuration)
         {
             this._productRepository = productRepository;
             this._serviceScopeFactory = serviceScopeFactory;
             this._mapper = mapper;
+            this.configuration = configuration;
+            IsLocalObjectImplementation = Convert.ToBoolean(configuration.GetSection("ImplementWithLocalObject").Value);
         }
+        /// <summary>
+        /// Implementaion with both local object and DB. 
+        /// </summary>
+        /// <param name="payloadDm"></param>
+        /// <returns></returns>
         public async Task Process(ProductsPayloadDm payloadDm)
         {
+            //Implementation with local object.
+            if (IsLocalObjectImplementation)
+            {
+                foreach (var product in payloadDm.Products)
+                {
+
+                    var prodEm = _mapper.Map<Product>(product);
+                    prodEm.CreatedOn = DateTime.UtcNow;
+                    Products.Add(prodEm);
+                }
+
+                return;
+            }
+
+
+
+            //Implementation with DB
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var _context = scope.ServiceProvider.GetService<DataContext>();

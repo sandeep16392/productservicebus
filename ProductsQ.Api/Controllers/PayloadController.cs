@@ -25,6 +25,11 @@ namespace ProductsQ.Api.Controllers
             this._vendorRepository = vendorRepository;
             this._serviceBusSender = serviceBusSender;
         }
+        /// <summary>
+        /// This method queues up a product in azure message sevice bus. Then the receiver kicks in and add the product from queue to DB.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody][Required] ProductsPayloadDm request)
         {

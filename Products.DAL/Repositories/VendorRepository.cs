@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Products.DAL.EntityModels;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace Products.DAL.Repositories
 {
@@ -15,14 +17,36 @@ namespace Products.DAL.Repositories
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-
-        public VendorRepository(DataContext context, IMapper mapper)
+        private readonly IConfiguration configuration;
+        private bool IsLocalObjectImplementation = false;
+        public List<Vendor> Vendors { get; set; }
+        public VendorRepository(DataContext context, IMapper mapper, IConfiguration configuration)
         {
             this._context = context;
             this._mapper = mapper;
+            this.configuration = configuration;
+            IsLocalObjectImplementation = Convert.ToBoolean(configuration.GetSection("ImplementWithLocalObject").Value);
         }
+        /// <summary>
+        /// Add Vendors to repository
+        /// </summary>
+        /// <param name="vendor"></param>
+        /// <returns></returns>
         public async Task<bool> Add(VendorDm vendor)
         {
+            if (IsLocalObjectImplementation)
+            {
+                var present = Vendors.Any(x => x.Code == vendor.Code);
+
+                if (present)
+                    throw new ArgumentException("Vendor Already Present.");
+
+                var vendors = _mapper.Map<Vendor>(vendor);
+                Vendors.Add(vendors);
+
+                return true;
+            }
+
             bool isPresent = await _context.Vendors.AnyAsync(x => x.Code == vendor.Code);
 
             if (isPresent)
@@ -36,6 +60,19 @@ namespace Products.DAL.Repositories
 
         public async Task<bool> Delete(string code)
         {
+
+            if (IsLocalObjectImplementation)
+            {
+                var localVendor = Vendors.FirstOrDefault(x => x.Code == code);
+
+                if (localVendor == null)
+                    throw new ArgumentNullException("Vendor not present.");
+
+                Vendors.Remove(localVendor);
+
+                return true;
+            }
+
             var vendor = await _context.Vendors.FirstOrDefaultAsync(x => x.Code == code);
 
             if (vendor == null)
@@ -48,6 +85,14 @@ namespace Products.DAL.Repositories
 
         public async Task<VendorDm> Get(string code)
         {
+            if (IsLocalObjectImplementation)
+            {
+                var localVendor = Vendors.FirstOrDefault(x => x.Code == code);
+                var localvendorDm = _mapper.Map<VendorDm>(localVendor);
+
+                return localvendorDm;
+            }
+
             var vendor = await _context.Vendors.FirstOrDefaultAsync(x => x.Code == code);
 
             var vendorDm = _mapper.Map<VendorDm>(vendor);
@@ -57,6 +102,12 @@ namespace Products.DAL.Repositories
 
         public async Task<ICollection<VendorDm>> RetrieveAll()
         {
+            if (IsLocalObjectImplementation)
+            {
+                var localVendors = _mapper.Map<List<VendorDm>>(Vendors);
+                return localVendors;
+            }
+
             var vendors = await _context.Vendors.ToListAsync();
 
             var vendorsDm = _mapper.Map<List<VendorDm>>(vendors);
