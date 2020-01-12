@@ -78,7 +78,9 @@ namespace ProductsQ.Api
             app.UseRouting();
 
             app.UseAuthorization();
-            app.UseCors();
+            app.UseCors(
+                options => options.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+            );
 
             app.UseEndpoints(endpoints =>
             {
