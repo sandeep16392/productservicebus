@@ -33,20 +33,6 @@ namespace ProductsQ.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody][Required] ProductsPayloadDm request)
         {
-            //try
-            //{
-            //    //var response = await _vendorRepository.Get(request.Vendor.Code);
-            //    if(response == null)
-            //    {
-            //        throw new ArgumentNullException("Vendor not present.");
-            //    }
-            //}
-            //catch (ArgumentException)
-            //{
-            //    return BadRequest($"Vendor with code{request.Vendor.Code} is not valid.");
-            //}
-
-            // Send this to the bus for the other services
             await _serviceBusSender.SendMessage(request);
 
             return Ok(request);
