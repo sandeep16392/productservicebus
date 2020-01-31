@@ -36,7 +36,7 @@ namespace ProductsQ.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var isLocal = Convert.ToBoolean(Configuration.GetSection("ImplementWithLocalObject").Value);
-            services.AddMvc().AddNewtonsoftJson();
+            services.AddMvc();
 
             services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("ProductsDatabase")));
 
